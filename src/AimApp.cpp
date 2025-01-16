@@ -1,4 +1,4 @@
-#include "AimApp.h"
+ï»¿#include "AimApp.h"
 
 DWORD AimApp::AimLabPid = 0;
 HWND AimApp::AimLabHWND = nullptr;
@@ -13,33 +13,33 @@ AimApp::AimApp() {}
 void AimApp::Init() {
 	GetPid();
 	EnumWindows(EnumWindows_GetHWND, AimLabPid);
-	//	Ã¶¾Ù¶¥²ã´°¿Ú£¬¶ÔÃ¿¸ö¶¥²ã´°¿ÚÖ´ĞĞ»Øµ÷º¯Êı£¬»Øµ÷º¯Êı·µ»ØÖµÎªÕæÔò¼ÌĞøÃ¶¾Ù£¬Îª·ñÍ£Ö¹Ã¶¾Ù
-	//	FindWindow()¿ÉÒÔ»ñÈ¡ÌØ¶¨Ãû³ÆµÄ¶¥²ã´°¿Ú
+	//	æšä¸¾é¡¶å±‚çª—å£ï¼Œå¯¹æ¯ä¸ªé¡¶å±‚çª—å£æ‰§è¡Œå›è°ƒå‡½æ•°ï¼Œå›è°ƒå‡½æ•°è¿”å›å€¼ä¸ºçœŸåˆ™ç»§ç»­æšä¸¾ï¼Œä¸ºå¦åœæ­¢æšä¸¾
+	//	FindWindow()å¯ä»¥è·å–ç‰¹å®šåç§°çš„é¡¶å±‚çª—å£
 
 	hConsole = GetStdHandle(STD_INPUT_HANDLE);
-	//	»ñµÃ¿ØÖÆÌ¨¾ä±ú
+	//	è·å¾—æ§åˆ¶å°å¥æŸ„
 
 	hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, NULL);
-	
+
 	WaitStart();
 
 }
 
 void AimApp::WaitStart() {
 	const int maxEvent = 1;
-	//	²¶»ñÊÂ¼ş»º´æµÄ´óĞ¡
+	//	æ•è·äº‹ä»¶ç¼“å­˜çš„å¤§å°
 
 	INPUT_RECORD irInBuf;
-	//	²¶»ñÊÂ¼şµÄ»º´æ
+	//	æ•è·äº‹ä»¶çš„ç¼“å­˜
 
 	DWORD EventRead;
-	//	Ğ´»á¶ÁÈ¡µ½µÄÊÂ¼şÊıÁ¿
+	//	å†™ä¼šè¯»å–åˆ°çš„äº‹ä»¶æ•°é‡
 
 	cout << "Press 'Enter' to Ready" << endl;
 
 	while (1) {
 		ReadConsoleInput(hConsole, &irInBuf, maxEvent, &EventRead);
-		//	https://blog.csdn.net/RedStone114514/article/details/142301892	¿ØÖÆÌ¨²¶»ñÊÂ¼ş
+		//	https://blog.csdn.net/RedStone114514/article/details/142301892	æ§åˆ¶å°æ•è·äº‹ä»¶
 
 		if (irInBuf.EventType == KEY_EVENT) {
 			WORD vkcode = irInBuf.Event.KeyEvent.wVirtualKeyCode;
@@ -49,7 +49,7 @@ void AimApp::WaitStart() {
 				RECT rect;
 				DwmGetWindowAttribute(AimLabHWND, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
 				SetCursorPos(rect.left + (rect.right - rect.left) / 2, rect.top + (rect.bottom - rect.top) / 2);
-				
+
 				IsRun = true;
 
 				RecognitionLoop();
@@ -66,7 +66,7 @@ void AimApp::WaitPlay() {
 void AimApp::CaptureWindow() {
 	RECT rect;
 	DwmGetWindowAttribute(AimLabHWND, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
-	//	»ñÈ¡²»º¬Í¶Ó°µÄ´°¿Ú¾ØĞÎ
+	//	è·å–ä¸å«æŠ•å½±çš„çª—å£çŸ©å½¢
 
 	int width = rect.right - rect.left;
 	int height = rect.bottom - rect.top;
@@ -74,19 +74,19 @@ void AimApp::CaptureWindow() {
 	int y = rect.top;
 
 	HDC screenDC = GetDC(NULL);
-	//	»ñÈ¡´°¿ÚÉÏÏÂÎÄ
+	//	è·å–çª—å£ä¸Šä¸‹æ–‡
 
 	HDC memDC = CreateCompatibleDC(screenDC);
-	//	´´½¨´°¿ÚÀàĞÍµÄÄÚ´æÉÏÏÂÎÄ
+	//	åˆ›å»ºçª—å£ç±»å‹çš„å†…å­˜ä¸Šä¸‹æ–‡
 
 	HBITMAP windowBitmap = CreateCompatibleBitmap(screenDC, width, height);
-	//	´´½¨´°¿ÚÎ»Í¼
+	//	åˆ›å»ºçª—å£ä½å›¾
 
 	SelectObject(memDC, windowBitmap);
-	//	½«´°¿ÚÎ»Í¼Ñ¡Èëµ½ÄÚ´æÉÏÏÂÎÄÖĞ
+	//	å°†çª—å£ä½å›¾é€‰å…¥åˆ°å†…å­˜ä¸Šä¸‹æ–‡ä¸­
 
 	BitBlt(memDC, 0, 0, width, height, screenDC, x, y, SRCCOPY);
-	//	½«´°¿ÚÉÏÏÂÎÄµÄÄÚÈİ¸´ÖÆµ½ÄÚ´æÉÏÏÂÎÄÖĞ
+	//	å°†çª—å£ä¸Šä¸‹æ–‡çš„å†…å®¹å¤åˆ¶åˆ°å†…å­˜ä¸Šä¸‹æ–‡ä¸­
 
 	LPVOID shotData = new char[width * height * 4];
 	GetBitmapBits(windowBitmap, width * height * 4, shotData);
@@ -95,7 +95,7 @@ void AimApp::CaptureWindow() {
 	//imshow("test", res);
 
 	Point clickCoor = FindBall(res, width / 2, height / 2);
-	//	¼ÆËãÒªµã»÷µÄÍ¼Æ¬
+	//	è®¡ç®—è¦ç‚¹å‡»çš„å›¾ç‰‡
 
 	shoot(clickCoor.x, clickCoor.y, width / 2, height / 2, x, y);
 
@@ -103,7 +103,7 @@ void AimApp::CaptureWindow() {
 	DeleteDC(memDC);
 	DeleteObject(windowBitmap);
 	delete[] shotData;
-	//	ÊÍ·Å¶ÔÏó
+	//	é‡Šæ”¾å¯¹è±¡
 }
 
 void AimApp::RecognitionLoop() {
@@ -123,15 +123,15 @@ void AimApp::shoot(int AimX, int AimY, int CenterX, int CenterY, int x, int y) {
 	drag.dy = dY * 1.5;
 	drag.dwFlags = MOUSEEVENTF_MOVE;
 
-	INPUT input0[1] = {0};
+	INPUT input0[1] = { 0 };
 	input0[0].type = INPUT_MOUSE;
 	input0[0].mi = drag;
 	SendInput(1, input0, sizeof(INPUT));
 	if (dX < 5 || dY < 5) {
 		cout << '[' << AimX << ' ' << AimY << ']' << endl;
-		INPUT input1[2] = {0};
+		INPUT input1[2] = { 0 };
 		input1[0].type = INPUT_MOUSE;
-		input1[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;	
+		input1[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
 		input1[1].type = INPUT_MOUSE;
 		input1[1].mi.dwFlags = MOUSEEVENTF_LEFTUP;
 		SendInput(2, input1, sizeof(INPUT));
@@ -142,37 +142,37 @@ Point AimApp::FindBall(Mat inputImg, int CenterX, int CenterY) {
 	Mat blurimg, hsv, mask0, mask1;
 
 	blur(inputImg, blurimg, Size(10, 10));
-	//	ÏÈÄ£ºı×ö½µÔë´¦Àí
+	//	å…ˆæ¨¡ç³Šåšé™å™ªå¤„ç†
 
 	cvtColor(blurimg, hsv, COLOR_BGR2HSV);
 
 	inRange(hsv, Scalar(0, 43, 46), Scalar(10, 255, 255), mask0);
 	inRange(hsv, Scalar(156, 43, 46), Scalar(180, 255, 255), mask1);
-	//	×¢ÒâºìÉ«ÓĞÁ½¸ö·¶Î§
+	//	æ³¨æ„çº¢è‰²æœ‰ä¸¤ä¸ªèŒƒå›´
 
 	Mat mask = mask0 | mask1;
 
 	vector<vector<Point>> contours;
-	//	´æ´¢ÂÖÀªµÄÊı×é
+	//	å­˜å‚¨è½®å»“çš„æ•°ç»„
 
 	findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
 	float minDistance = 1.0e10;
 	Point res;
 
-	// ±éÀúËùÓĞÂÖÀª
+	// éå†æ‰€æœ‰è½®å»“
 	for (const auto& contour : contours) {
 		Moments M = moments(contour);
-		// ¼ÆËãÂÖÀªµÄ¾Ø
+		// è®¡ç®—è½®å»“çš„çŸ©
 
 		Point2f circleCenter(M.m10 / M.m00, M.m01 / M.m00);
-		// ¼ÆËã¼¸ºÎÖĞĞÄ£¨Ô²ĞÄ½üËÆ£©
+		// è®¡ç®—å‡ ä½•ä¸­å¿ƒï¼ˆåœ†å¿ƒè¿‘ä¼¼ï¼‰
 		//	https://www.docin.com/p-1822723112.html
 
 		float distance = sqrt(pow(circleCenter.x - CenterX, 2) + std::pow(circleCenter.y - CenterY, 2));
-		// ¼ÆËãµ½Í¼ÏñÖĞĞÄµÄ¾àÀë
+		// è®¡ç®—åˆ°å›¾åƒä¸­å¿ƒçš„è·ç¦»
 
-		// ¸üĞÂ×îĞ¡¾àÀëºÍ×î½üÔ²ĞÄ
+		// æ›´æ–°æœ€å°è·ç¦»å’Œæœ€è¿‘åœ†å¿ƒ
 		if (distance < minDistance) {
 			minDistance = distance;
 			res = circleCenter;
@@ -180,7 +180,7 @@ Point AimApp::FindBall(Mat inputImg, int CenterX, int CenterY) {
 		}
 	}
 	//res = Point(round(res.x), round(res.y));
-	
+
 	//Mat maskColor;
 	//cvtColor(mask, maskColor, COLOR_GRAY2BGR);
 
@@ -190,10 +190,10 @@ Point AimApp::FindBall(Mat inputImg, int CenterX, int CenterY) {
 	return res;
 }
 
-BOOL CALLBACK AimApp::EnumWindows_GetHWND(HWND hwnd, LPARAM lParam) {//	Ã¶¾Ù¶¥²ã´°¿ÚÕÒµ½¶ÔÓ¦PidµÄ¾ä±ú
+BOOL CALLBACK AimApp::EnumWindows_GetHWND(HWND hwnd, LPARAM lParam) {//	æšä¸¾é¡¶å±‚çª—å£æ‰¾åˆ°å¯¹åº”Pidçš„å¥æŸ„
 	DWORD tempPid;
 	GetWindowThreadProcessId(hwnd, &tempPid);
-	//	»ñÈ¡¶ÔÓ¦¾ä±úµÄPid
+	//	è·å–å¯¹åº”å¥æŸ„çš„Pid
 
 	if (tempPid == lParam) {
 		AimLabHWND = hwnd;
@@ -203,12 +203,12 @@ BOOL CALLBACK AimApp::EnumWindows_GetHWND(HWND hwnd, LPARAM lParam) {//	Ã¶¾Ù¶¥²ã
 }
 
 LRESULT CALLBACK AimApp::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	//	WindowsHookEx ¼à¿Ø¼üÅÌµÄµÍ²ã´Î¹³×ÓµÄ»Øµ÷º¯Êı
+	//	WindowsHookEx ç›‘æ§é”®ç›˜çš„ä½å±‚æ¬¡é’©å­çš„å›è°ƒå‡½æ•°
 	//	https://blog.csdn.net/qq_29020861/article/details/54865332
 	if (nCode == HC_ACTION) {
 		KBDLLHOOKSTRUCT* kbdStruct = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 		if (kbdStruct->vkCode == VK_ESCAPE && wParam == WM_KEYDOWN) {
-			// ESC ¼ü±»°´ÏÂ
+			// ESC é”®è¢«æŒ‰ä¸‹
 			PressCount++;
 			switch (PressCount) {
 			case 1:
@@ -223,7 +223,7 @@ LRESULT CALLBACK AimApp::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM l
 			}
 		}
 	}
-	// µ÷ÓÃÏÂÒ»¸ö¹³×Ó
+	// è°ƒç”¨ä¸‹ä¸€ä¸ªé’©å­
 	return CallNextHookEx(hHook, nCode, wParam, lParam);
 }
 
