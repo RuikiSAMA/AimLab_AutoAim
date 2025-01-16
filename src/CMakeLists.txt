@@ -17,4 +17,4 @@ find_package(OpenCV REQUIRED)
 add_executable(OpenCV_AimLab ${SOURCE_CODE})
 
 # 链接OpenCV库
-target_link_libraries(OpenCV_AimLab Dwmapi ${OpenCV_LIBS} ${OpenCV_LIBRARIES})
+target_link_libraries(OpenCV_AimLab Dwmapi ${OpenCV_LIBS} )
